@@ -1,13 +1,13 @@
 import './App.css'
 import { Routes, Route } from 'react-router-dom'
-import Home from './components/Home'
-import Videos from './components/Videos'
+import Home from './components/Home.jsx'
+import Videos from './components/Videos.jsx'
 function App() {
   return (
-    <>
-    <Route path="/" element={<Home />}/>
-    <Route path="/videos" element={<Videos />}/>
-    </>
+    <Routes>
+      <Route path="/" element={<Home />}/>
+      <Route path="/videos" element={<Videos />}/>
+    </Routes>
   )
 }
 
