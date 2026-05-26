@@ -53,8 +53,8 @@ export default function Preview() {
                 <div className="lg:col-span-2 bg-red-50 border-l-4 border-red-500 p-4 my-6 rounded-r shadow-xs">
                     <div className="flex">
                         <div className="ml-3">
-                            <p className="text-sm text-red-700 font-bold">Error Display</p>
-                            <p className="text-xs text-red-600 mt-1">Could not load video: {error}</p>
+                            <p className="text-sm text-red-700 font-bold">Error Preview</p>
+                            <p className="text-xs text-red-600 mt-1">Could not preview video: {error}</p>
                         </div>
                     </div>
                 </div>
