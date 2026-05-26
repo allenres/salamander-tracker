@@ -40,13 +40,22 @@ export default function Preview() {
 
         {/* Dashboard Workspace Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            {loading && (
+                <div className="flex flex-col items-center justify-center my-12 gap-3 lg:col-span-2 bg-text/5 border-2 border-dashed border-secondary/60 rounded-2xl">
+                    <div className="animate-spin rounded-full h-12 w-12 border-4 border-secondary border-t-primary"></div>
+                    <p className="text-sm font-semibold text-primary animate-pulse">Loading preview...</p>
+                </div>
+            )}
             
             {/* Left/Center Column: Main video container layout placeholder */}
-            <div className="lg:col-span-2">
+            {!loading && !error && (<div className="lg:col-span-2">
                 <div className="aspect-video bg-text/5 border-2 border-dashed border-secondary/60 rounded-2xl flex flex-col items-center justify-center p-6 text-center min-h-[300px]">
-                    <img src={thumbnail} alt="" />
+                    <div>
+                    <img src={thumbnail} alt="" class="w-[320px] h-[180px]"/>
+                    </div>
                 </div>
-            </div>
+            </div>)}
 
             {/* Right Column: Configuration Controls panel layout placeholder */}
             <div className="bg-secondary/10 border border-secondary/40 rounded-2xl p-5 h-fit">
