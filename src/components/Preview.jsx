@@ -47,6 +47,18 @@ export default function Preview() {
                     <p className="text-sm font-semibold text-primary animate-pulse">Loading preview...</p>
                 </div>
             )}
+
+            {/* --- Error State --- */}
+            {error && !loading && (
+                <div className="lg:col-span-2 bg-red-50 border-l-4 border-red-500 p-4 my-6 rounded-r shadow-xs">
+                    <div className="flex">
+                        <div className="ml-3">
+                            <p className="text-sm text-red-700 font-bold">Error Display</p>
+                            <p className="text-xs text-red-600 mt-1">Could not load video: {error}</p>
+                        </div>
+                    </div>
+                </div>
+            )}
             
             {/* Left/Center Column: Main video container layout placeholder */}
             {!loading && !error && (<div className="lg:col-span-2">
