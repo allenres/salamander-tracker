@@ -1,7 +1,23 @@
+import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { getThumbnail } from '../mockApi.js';
 
 export default function Preview() {
   const { filename } = useParams();
+    const [thumbnail, setThumbnail] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        getThumbnail()
+            .then((data) => {
+                setThumbnail(data);
+                setLoading(false);
+            }).catch((err) => {
+                setError(err.message || "Failed to fetch videos.");
+                setLoading(false);
+            });
+    }, []);
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">

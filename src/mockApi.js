@@ -10,7 +10,7 @@ const videos = [
 const thumbnails = {
   // Map filename -> URL of an image to use as its thumbnail.
   // For now, use any salamander image you have or a placeholder service.
-  "salamander1.mp4": "https://placehold.co/320x180?text=salamander1",
+  "salamander1.mp4": "/salamander1.jpg",
   "salamander2.mov": "https://placehold.co/320x180?text=salamander2",
   "forest_intro.mp4": "https://placehold.co/320x180?text=forest_intro",
   "tank_view_long.mp4": "https://placehold.co/320x180?text=tank_view_long",
@@ -27,7 +27,7 @@ export async function getVideos() {
 }
 
 export async function getThumbnail(filename) {
-  await delay(300);
+  await delay(2000);
   if (!thumbnails[filename]) {
     throw new Error(`No thumbnail for ${filename}`);
   }
