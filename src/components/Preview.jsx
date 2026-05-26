@@ -7,6 +7,7 @@ export default function Preview() {
     const [thumbnail, setThumbnail] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [thresh, setThresh] = useState(0);
 
     useEffect(() => {
         getThumbnail(filename)
@@ -39,7 +40,7 @@ export default function Preview() {
         </div>
 
         {/* Dashboard Workspace Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-8">
 
             {loading && (
                 <div className="flex flex-col items-center justify-center my-12 gap-3 lg:col-span-2 bg-text/5 border-2 border-dashed border-secondary/60 rounded-2xl">
@@ -78,10 +79,8 @@ export default function Preview() {
                 {/* Visual placeholder items */}
                 <div className="space-y-4 py-2">
                     <div>
-                        <label className="block text-xs font-bold text-text/70 uppercase tracking-wider mb-1">Detection Sensitivity</label>
-                        <div className="h-2 w-full bg-secondary/40 rounded-full overflow-hidden">
-                            <div className="h-full w-2/3 bg-primary rounded-full"></div>
-                        </div>
+                        <label className="block text-xs font-bold text-text/70 uppercase tracking-wider mb-1">Threshold</label>
+                        <input id="thresh" className="h-2 w-full rounded-full" type="range" min="0" max="255"/>
                     </div>
                     <div>
                         <label className="block text-xs font-bold text-text/70 uppercase tracking-wider mb-1">Analysis Mode</label>
@@ -91,10 +90,6 @@ export default function Preview() {
                         </div>
                     </div>
                 </div>
-
-                <p className="text-xs text-text/50 mt-6 pt-4 border-t border-secondary/30 italic">
-                    Tuning controls will go here in a future pair program.
-                </p>
             </div>
 
         </div>
