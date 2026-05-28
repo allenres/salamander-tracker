@@ -133,7 +133,7 @@ export default function Preview() {
                             </div>
 
                             <div>
-                                <p className="text-xs font-semibold text-text/50 mb-1">Canvas Output</p>
+                                <p className="text-xs font-semibold text-text/50 mb-1">Binarized</p>
                                 <canvas
                                     ref={canvasRef}
                                     className="w-[320px] h-[180px] object-cover rounded-md shadow-md bg-white"
