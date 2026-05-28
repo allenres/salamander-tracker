@@ -172,14 +172,6 @@ export default function Preview() {
                 }}
               />
             </div>
-
-            <div>
-              <label className="block text-xs font-bold text-text/70 uppercase tracking-wider mb-1">Analysis Mode</label>
-              <div className="grid grid-cols-2 gap-2 text-xs font-semibold">
-                <span className="bg-primary text-white text-center py-1.5 rounded-md shadow-xs cursor-default">Automated</span>
-                <span className="bg-white text-text/60 border border-secondary text-center py-1.5 rounded-md cursor-default">Manual Toggle</span>
-              </div>
-            </div>
           </div>
         </div>
 
