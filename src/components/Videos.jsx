@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getVideos } from '../mockApi.js';
+import { getVideos } from '../api.js';
 import { useNavigate } from "react-router-dom";
 
 function Videos() {
