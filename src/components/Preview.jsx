@@ -15,6 +15,8 @@ export default function Preview() {
     const imgRef = useRef(null);
     const [imageReady, setImageReady] = useState(false);
 
+    const [isProcessing, setIsProcessing] = useState(false)
+
     useEffect(() => {
         getThumbnail(filename)
             .then((data) => {
@@ -81,6 +83,13 @@ export default function Preview() {
 
         ctx.putImageData(data, 0, 0);
     }, [imageReady, color, tolerance]);
+
+    function processVideo() {
+        setIsProcessing(!isProcessing)
+        const params = [filename, color, tolerance];
+        console.log(params)
+        submitProcessingJob(params[0], params[1], params[2])
+    }
 
     return (
         <div className="max-w-5xl mx-auto px-4 py-8">
@@ -199,8 +208,13 @@ export default function Preview() {
                                 active:scale-[0.98]
                                 border border-primary/40
                                 cursor-pointer
-                            ">
-                        Process Video with These Settings
+                                disabled:opacity-50
+                            "
+                            onClick={processVideo}
+                            disabled={isProcessing}
+                            >
+                                {isProcessing ? "Processing video..." : "Process Video with These Settings"}
+                        
                     </button>
                 </div>
 
