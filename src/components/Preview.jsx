@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { getThumbnail } from '../api.js';
+import { getThumbnail, submitProcessingJob } from '../api.js';
 
 export default function Preview() {
     const { filename } = useParams();
@@ -183,8 +183,25 @@ export default function Preview() {
                                     setColor(e.target.value);
                                 }}
                             />
+                            
                         </div>
+                        
                     </div>
+                    <button className="
+                                w-full mt-6
+                                bg-primary text-white
+                                font-semibold text-sm
+                                px-4 py-3
+                                rounded-xl
+                                shadow-xs
+                                transition-all duration-200
+                                hover:brightness-110
+                                active:scale-[0.98]
+                                border border-primary/40
+                                cursor-pointer
+                            ">
+                        Process Video with These Settings
+                    </button>
                 </div>
 
             </div>
