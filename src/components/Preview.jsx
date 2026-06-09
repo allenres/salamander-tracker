@@ -75,9 +75,9 @@ export default function Preview() {
                 px[i + 1] = 255;
                 px[i + 2] = 255;
             } else {
-                px[i] = 0;  
-                px[i + 1] = 0; 
-                px[i + 2] = 0;  
+                px[i] = 0;
+                px[i + 1] = 0;
+                px[i + 2] = 0;
             }
         }
 
@@ -138,15 +138,25 @@ export default function Preview() {
                         <div className="aspect-video bg-text/5 border-2 border-dashed border-secondary/60 rounded-2xl flex flex-row items-center justify-center gap-4 p-6 text-center min-h-[300px]">
                             <div>
                                 <p className="text-xs font-semibold text-text/50 mb-1">Original</p>
-                                <img src={thumbnail} alt="Original Thumbnail" className="w-[320px] h-[180px] object-cover rounded-md shadow-md" />
+                                {!imageReady && (
+                                    <div className="flex flex-col items-center justify-center w-[320px] h-[180px]">
+                                        <div className="animate-spin rounded-full h-12 w-12 border-4 border-secondary border-t-primary"></div>
+                                    </div>
+                                )}
+                                {imageReady && (<img src={thumbnail} alt="Original Thumbnail" className="w-[320px] h-[180px]" />)}
                             </div>
 
                             <div>
                                 <p className="text-xs font-semibold text-text/50 mb-1">Binarized</p>
-                                <canvas
+                                {!imageReady && (
+                                    <div className="flex flex-col items-center justify-center w-[320px] h-[180px]">
+                                        <div className="animate-spin rounded-full h-12 w-12 border-4 border-secondary border-t-primary"></div>
+                                    </div>
+                                )}
+                                {imageReady && (<canvas
                                     ref={canvasRef}
-                                    className="w-[320px] h-[180px] object-cover rounded-md shadow-md bg-white"
-                                />
+                                    className="w-[320px] h-[180px]"
+                                />)}
                             </div>
                         </div>
                     </div>
@@ -192,9 +202,9 @@ export default function Preview() {
                                     setColor(e.target.value);
                                 }}
                             />
-                            
+
                         </div>
-                        
+
                     </div>
                     <button className="
                                 w-full mt-6
@@ -210,11 +220,11 @@ export default function Preview() {
                                 cursor-pointer
                                 disabled:opacity-50
                             "
-                            onClick={processVideo}
-                            disabled={isProcessing}
-                            >
-                                {isProcessing ? "Processing video..." : "Process Video with These Settings"}
-                        
+                        onClick={processVideo}
+                        disabled={isProcessing}
+                    >
+                        {isProcessing ? "Processing video..." : "Process Video with These Settings"}
+
                     </button>
                 </div>
 
