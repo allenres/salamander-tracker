@@ -16,6 +16,21 @@ export default function Preview() {
     const [imageReady, setImageReady] = useState(false);
 
     const [isProcessing, setIsProcessing] = useState(false)
+    const [jobId, setJobId] = useState(null);
+
+    //UseEffect for polling
+    /*
+        useEffect
+            run function
+                function check the data then check if the object status is done
+                SetInterval for polling
+            
+        dependent on (jobid)
+    */
+
+    // useEffect(
+
+    // , [jobId])
 
     useEffect(() => {
         getThumbnail(filename)
@@ -88,7 +103,12 @@ export default function Preview() {
         setIsProcessing(!isProcessing)
         const params = [filename, color, tolerance];
         console.log(params)
-        submitProcessingJob(params[0], params[1], params[2])
+        getJobId(params)
+    }
+
+    async function getJobId(arr) {
+        const process = await submitProcessingJob(arr[0], arr[1], arr[2]);
+        console.log(process.jobId)
     }
 
     return (
