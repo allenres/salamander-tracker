@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { getThumbnail, submitProcessingJob } from '../api.js';
+import { getThumbnail, submitProcessingJob, getJobStatus } from '../api.js';
 
 export default function Preview() {
     const { filename } = useParams();
@@ -16,6 +16,38 @@ export default function Preview() {
     const [imageReady, setImageReady] = useState(false);
 
     const [isProcessing, setIsProcessing] = useState(false)
+    const [jobId, setJobId] = useState(null);
+
+    //UseEffect for polling
+    /*
+        useEffect
+            run function
+                function check the data then check if the object status is done
+                SetInterval for polling
+            
+        dependent on (jobid)
+    */
+
+    // useEffect(
+
+    // , [jobId])
+
+ 
+
+    useEffect(() => {
+        //if not jobId return
+        if(!jobId) return;
+
+        const id = setInterval(async () => {
+            const status = await getJobStatus(jobId);
+
+            if(status.status === "done"){
+                setIsProcessing(!isProcessing)
+            }
+
+        }, 5000)
+    }, 
+    [jobId])
 
     useEffect(() => {
         getThumbnail(filename)
@@ -88,7 +120,12 @@ export default function Preview() {
         setIsProcessing(!isProcessing)
         const params = [filename, color, tolerance];
         console.log(params)
-        submitProcessingJob(params[0], params[1], params[2])
+        getJobId(params)
+    }
+
+    async function getJobId(arr) {
+        const process = await submitProcessingJob(arr[0], arr[1], arr[2]);
+        setJobId(process.jobId)
     }
 
     return (
@@ -204,8 +241,6 @@ export default function Preview() {
                                 rounded-xl
                                 shadow-xs
                                 transition-all duration-200
-                                hover:brightness-110
-                                active:scale-[0.98]
                                 border border-primary/40
                                 cursor-pointer
                                 disabled:opacity-50
@@ -216,8 +251,9 @@ export default function Preview() {
                                 {isProcessing ? "Processing video..." : "Process Video with These Settings"}
                         
                     </button>
-                </div>
 
+                </div>
+                
             </div>
         </div>
     );
