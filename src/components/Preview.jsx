@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { getThumbnail, submitProcessingJob } from '../api.js';
+import { getThumbnail, submitProcessingJob, getJobStatus } from '../api.js';
 
 export default function Preview() {
     const { filename } = useParams();
@@ -31,6 +31,23 @@ export default function Preview() {
     // useEffect(
 
     // , [jobId])
+
+ 
+
+    useEffect(() => {
+        //if not jobId return
+        if(!jobId) return;
+
+        const id = setInterval(async () => {
+            const status = await getJobStatus(jobId);
+
+            if(status.status === "done"){
+                setIsProcessing(!isProcessing)
+            }
+
+        }, 5000)
+    }, 
+    [jobId])
 
     useEffect(() => {
         getThumbnail(filename)
@@ -108,7 +125,7 @@ export default function Preview() {
 
     async function getJobId(arr) {
         const process = await submitProcessingJob(arr[0], arr[1], arr[2]);
-        console.log(process.jobId)
+        setJobId(process.jobId)
     }
 
     return (
@@ -234,8 +251,6 @@ export default function Preview() {
                                 rounded-xl
                                 shadow-xs
                                 transition-all duration-200
-                                hover:brightness-110
-                                active:scale-[0.98]
                                 border border-primary/40
                                 cursor-pointer
                                 disabled:opacity-50
@@ -246,8 +261,9 @@ export default function Preview() {
                         {isProcessing ? "Processing video..." : "Process Video with These Settings"}
 
                     </button>
-                </div>
 
+                </div>
+                
             </div>
         </div>
     );
