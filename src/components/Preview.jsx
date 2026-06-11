@@ -15,40 +15,6 @@ export default function Preview() {
     const imgRef = useRef(null);
     const [imageReady, setImageReady] = useState(false);
 
-    const [isProcessing, setIsProcessing] = useState(false)
-    const [jobId, setJobId] = useState(null);
-
-    //UseEffect for polling
-    /*
-        useEffect
-            run function
-                function check the data then check if the object status is done
-                SetInterval for polling
-            
-        dependent on (jobid)
-    */
-
-    // useEffect(
-
-    // , [jobId])
-
- 
-
-    useEffect(() => {
-        //if not jobId return
-        if(!jobId) return;
-
-        const id = setInterval(async () => {
-            const status = await getJobStatus(jobId);
-
-            if(status.status === "done"){
-                setIsProcessing(!isProcessing)
-            }
-
-        }, 5000)
-    }, 
-    [jobId])
-
     useEffect(() => {
         getThumbnail(filename)
             .then((data) => {
@@ -115,9 +81,36 @@ export default function Preview() {
 
         ctx.putImageData(data, 0, 0);
     }, [imageReady, color, tolerance]);
+    
+    const [isProcessing, setIsProcessing] = useState(false)
+    const [jobId, setJobId] = useState(null);
+
+     useEffect(() => {
+        //if not jobId return
+        if(!jobId) return;
+
+        const id = setInterval(async () => {
+            const status = await getJobStatus(jobId);
+
+            if(!status){
+                clearInterval(id)
+                return
+            }
+
+            if(status.status === "done"){
+                setIsProcessing(false)
+                clearInterval(id)
+            }
+
+        }, 5000)
+
+        return () => clearInterval(id)
+    }, 
+    [jobId])
+
 
     function processVideo() {
-        setIsProcessing(!isProcessing)
+        setIsProcessing(true)
         const params = [filename, color, tolerance];
         console.log(params)
         getJobId(params)
