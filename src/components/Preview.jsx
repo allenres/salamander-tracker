@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getThumbnail, submitProcessingJob, getJobStatus } from '../api.js';
+import LinearProgress from '@mui/material/LinearProgress';
 
 export default function Preview() {
     const { filename } = useParams();
@@ -244,7 +245,11 @@ export default function Preview() {
                                 {isProcessing ? "Processing video..." : "Process Video with These Settings"}
                         
                     </button>
-
+                    {isProcessing && (
+                        <div style={{ width: "100%", marginTop: 16 }}>
+                            <LinearProgress />
+                        </div>
+                    )}
                 </div>
                 
             </div>
