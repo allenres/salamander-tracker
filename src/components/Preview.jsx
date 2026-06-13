@@ -8,7 +8,7 @@ export default function Preview() {
     const [thumbnail, setThumbnail] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [processingError, setProcessingError] = useState(null)
+    const [processingMessage, setProcessingMessage] = useState(null)
 
     const [color, setColor] = useState('#000000');
     const [tolerance, setTolerance] = useState(0);
@@ -101,12 +101,13 @@ export default function Preview() {
 
             if(status.status === "done"){
                 setIsProcessing(false)
+                setProcessingMessage("Processing complete")
                 clearInterval(id)
             }
 
             if(status.status === "error"){
                 setIsProcessing(false)
-                setProcessingError(status.error)
+                setProcessingMessage(status.error)
                 clearInterval(id)
             }
 
@@ -258,10 +259,10 @@ export default function Preview() {
                         </div>
                     )}
                     
-                    {processingError && 
+                    {processingMessage && 
                     <div className="mt-5">
-                        <div className="text-xs text-red-600 mt-1">
-                            {processingError}
+                        <div className={processingMessage === "Processing complete" ? "text-xs text-green-600 mt-1" : "text-xs text-red-600 mt-1" }>
+                            {processingMessage}
                         </div>
                     </div>}
                 </div>
