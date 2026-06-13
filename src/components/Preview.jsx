@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, use } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getThumbnail, submitProcessingJob, getJobStatus } from '../api.js';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -8,7 +8,7 @@ export default function Preview() {
     const [thumbnail, setThumbnail] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [processingMessage, setProcessingMessage] = useState(null)
+    const [processingMessage, setProcessingMessage] = useState(null);
 
     const [color, setColor] = useState('#000000');
     const [tolerance, setTolerance] = useState(0);
@@ -17,6 +17,7 @@ export default function Preview() {
     const imgRef = useRef(null);
     const [imageReady, setImageReady] = useState(false);
 
+    // Initial Fetch
     useEffect(() => {
         getThumbnail(filename)
             .then((data) => {
@@ -28,8 +29,9 @@ export default function Preview() {
             });
     }, [filename]);
 
+    // Image Loader
     useEffect(() => {
-        if (!thumbnail) return;
+        if (!thumbnail || thumbnail.length === 0) return;
         setImageReady(false);
         const img = new Image();
         img.crossOrigin = 'anonymous';
@@ -40,6 +42,7 @@ export default function Preview() {
         img.src = thumbnail;
     }, [thumbnail]);
 
+    // Canvas Binarization
     useEffect(() => {
         if (!imageReady) return;
         const img = imgRef.current;
@@ -84,50 +87,63 @@ export default function Preview() {
         ctx.putImageData(data, 0, 0);
     }, [imageReady, color, tolerance]);
     
-    const [isProcessing, setIsProcessing] = useState(false)
+    const [isProcessing, setIsProcessing] = useState(false);
     const [jobId, setJobId] = useState(null);
 
-     useEffect(() => {
-        //if not jobId return
+    // Job Status Polling
+    useEffect(() => {
         if(!jobId) return;
 
         const id = setInterval(async () => {
-            const status = await getJobStatus(jobId);
+            try {
+                const status = await getJobStatus(jobId);
 
-            if(!status){
-                clearInterval(id)
-                return
+                if(!status){
+                    clearInterval(id);
+                    return;
+                }
+
+                if(status.status === "done"){
+                    setIsProcessing(false);
+                    setProcessingMessage("Processing complete");
+                    clearInterval(id);
+                }
+
+                if(status.status === "error"){
+                    setIsProcessing(false);
+                    setProcessingMessage(status.error || "Job failed on the server.");
+                    clearInterval(id);
+                }
+            } catch (err) {
+                setIsProcessing(false);
+                setProcessingMessage("Failed to check job status.");
+                clearInterval(id);
             }
+        }, 5000);
 
-            if(status.status === "done"){
-                setIsProcessing(false)
-                setProcessingMessage("Processing complete")
-                clearInterval(id)
-            }
+        return () => clearInterval(id);
+    }, [jobId]);
 
-            if(status.status === "error"){
-                setIsProcessing(false)
-                setProcessingMessage(status.error)
-                clearInterval(id)
-            }
-
-        }, 5000)
-
-        return () => clearInterval(id)
-    }, 
-    [jobId])
-
-
-    function processVideo() {
-        setIsProcessing(true)
-        const params = [filename, color, tolerance];
-        console.log(params)
-        getJobId(params)
-    }
-
-    async function getJobId(arr) {
-        const process = await submitProcessingJob(arr[0], arr[1], arr[2]);
-        setJobId(process.jobId)
+    // Submits the job to the API
+    async function processVideo() {
+        setIsProcessing(true);
+        setProcessingMessage(null); // Clear any previous errors/success messages
+        setJobId(null); // Reset job ID for a fresh run
+        
+        try {
+            // Remove the '#' from the hex color
+            const hexWithoutHash = color.replace('#', '');
+            
+            // Submit job with correct parameters
+            const response = await submitProcessingJob(filename, hexWithoutHash, tolerance);
+            
+            // Store returned jobId
+            setJobId(response.jobId);
+        } catch (err) {
+            // Handle submission failure and allow retry
+            setIsProcessing(false);
+            setProcessingMessage(err.message || "Failed to submit job. Please try again.");
+        }
     }
 
     return (
@@ -209,11 +225,7 @@ export default function Preview() {
                                 min="0"
                                 max="255"
                                 value={tolerance}
-                                onChange={(e) => {
-                                    const val = Number(e.target.value);
-                                    console.log('Tolerance updated:', val);
-                                    setTolerance(val);
-                                }}
+                                onChange={(e) => setTolerance(Number(e.target.value))}
                             />
                         </div>
 
@@ -226,15 +238,12 @@ export default function Preview() {
                                 className="w-full h-10 rounded-md cursor-pointer bg-transparent"
                                 type="color"
                                 value={color}
-                                onChange={(e) => {
-                                    console.log('Color updated:', e.target.value);
-                                    setColor(e.target.value);
-                                }}
+                                onChange={(e) => setColor(e.target.value)}
                             />
-                            
                         </div>
                         
                     </div>
+                    
                     <button className="
                                 w-full mt-6
                                 bg-primary text-white
@@ -246,6 +255,7 @@ export default function Preview() {
                                 border border-primary/40
                                 cursor-pointer
                                 disabled:opacity-50
+                                disabled:cursor-not-allowed
                             "
                             onClick={processVideo}
                             disabled={isProcessing}
@@ -253,6 +263,7 @@ export default function Preview() {
                                 {isProcessing ? "Processing video..." : "Process Video with These Settings"}
                         
                     </button>
+                    
                     {isProcessing && (
                         <div style={{ width: "100%", marginTop: 16 }}>
                             <LinearProgress />
@@ -261,15 +272,12 @@ export default function Preview() {
                     
                     {processingMessage && 
                     <div className="mt-5">
-                        <div className={processingMessage === "Processing complete" ? "text-xs text-green-600 mt-1" : "text-xs text-red-600 mt-1" }>
+                        <div className={processingMessage === "Processing complete" ? "text-sm font-semibold text-green-600 mt-1" : "text-sm font-semibold text-red-600 mt-1" }>
                             {processingMessage}
                         </div>
                     </div>}
                 </div>
-                
             </div>
-            
-            
         </div>
     );
 }
