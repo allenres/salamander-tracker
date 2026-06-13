@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, use } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getThumbnail, submitProcessingJob, getJobStatus } from '../api.js';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -8,6 +8,7 @@ export default function Preview() {
     const [thumbnail, setThumbnail] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [processingError, setProcessingError] = useState(null)
 
     const [color, setColor] = useState('#000000');
     const [tolerance, setTolerance] = useState(0);
@@ -100,6 +101,12 @@ export default function Preview() {
 
             if(status.status === "done"){
                 setIsProcessing(false)
+                clearInterval(id)
+            }
+
+            if(status.status === "error"){
+                setIsProcessing(false)
+                setProcessingError(status.error)
                 clearInterval(id)
             }
 
@@ -250,9 +257,18 @@ export default function Preview() {
                             <LinearProgress />
                         </div>
                     )}
+                    
+                    {processingError && 
+                    <div className="mt-5">
+                        <div className="text-xs text-red-600 mt-1">
+                            {processingError}
+                        </div>
+                    </div>}
                 </div>
                 
             </div>
+            
+            
         </div>
     );
 }
