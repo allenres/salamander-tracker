@@ -42,7 +42,7 @@ export default function Preview() {
         img.src = thumbnail;
     }, [thumbnail]);
 
-    // Canvas Binarization
+    // Canvas Binarization & Centroid Finding
     useEffect(() => {
         if (!imageReady) return;
         const img = imgRef.current;
@@ -62,6 +62,7 @@ export default function Preview() {
         const targetG = parseInt(color.substring(3, 5), 16);
         const targetB = parseInt(color.substring(5, 7), 16);
 
+        // Binarize Image
         for (let i = 0; i < px.length; i += 4) {
             const r = px[i];
             const g = px[i + 1];
@@ -78,38 +79,115 @@ export default function Preview() {
                 px[i + 1] = 255;
                 px[i + 2] = 255;
             } else {
-                px[i] = 0;  
-                px[i + 1] = 0; 
-                px[i + 2] = 0;  
+                px[i] = 0;
+                px[i + 1] = 0;
+                px[i + 2] = 0;
             }
         }
 
         ctx.putImageData(data, 0, 0);
+
+        // DFS Group Finder
+        const width = canvas.width;
+        const height = canvas.height;
+        // Uint8Array is much faster for a 1D visited map than standard JS arrays
+        const visited = new Uint8Array(width * height);
+        let largestGroup = null;
+
+        const exploreGroup = (startX, startY) => {
+            const stack = [startY * width + startX];
+            let size = 0;
+            let sumX = 0;
+            let sumY = 0;
+
+            while (stack.length > 0) {
+                const currentIdx = stack.pop();
+                const cx = currentIdx % width;
+                const cy = Math.floor(currentIdx / width);
+
+                if (visited[currentIdx] === 1) continue;
+                visited[currentIdx] = 1;
+
+                size++;
+                sumX += cx;
+                sumY += cy;
+
+                // up
+                if (cy > 0 && px[(currentIdx - width) * 4] === 255 && visited[currentIdx - width] === 0) {
+                    stack.push(currentIdx - width);
+                }
+                // down
+                if (cy < height - 1 && px[(currentIdx + width) * 4] === 255 && visited[currentIdx + width] === 0) {
+                    stack.push(currentIdx + width);
+                }
+                // left
+                if (cx > 0 && px[(currentIdx - 1) * 4] === 255 && visited[currentIdx - 1] === 0) {
+                    stack.push(currentIdx - 1);
+                }
+                // right
+                if (cx < width - 1 && px[(currentIdx + 1) * 4] === 255 && visited[currentIdx + 1] === 0) {
+                    stack.push(currentIdx + 1);
+                }
+            }
+
+            return {
+                size,
+                centroidX: Math.floor(sumX / size),
+                centroidY: Math.floor(sumY / size)
+            };
+        };
+
+        // Scan the image to find the largest group of white (255) pixels
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                const idx = y * width + x;
+                // px array is flat RGBA. R channel is at idx * 4.
+                if (px[idx * 4] === 255 && visited[idx] === 0) {
+                    const group = exploreGroup(x, y);
+                    if (!largestGroup || group.size > largestGroup.size) {
+                        largestGroup = group;
+                    }
+                }
+            }
+        }
+
+        // Draw the centroid marker if a group exists
+        if (largestGroup) {
+            ctx.fillStyle = '#ff0000';
+            ctx.beginPath();
+            ctx.arc(largestGroup.centroidX, largestGroup.centroidY, 10, 0, 2 * Math.PI);
+            ctx.fill();
+
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#00ff22';
+            ctx.stroke();
+        }
+
     }, [imageReady, color, tolerance]);
-    
+
     const [isProcessing, setIsProcessing] = useState(false);
     const [jobId, setJobId] = useState(null);
 
     // Job Status Polling
     useEffect(() => {
-        if(!jobId) return;
+        if (!jobId) return;
 
         const id = setInterval(async () => {
             try {
                 const status = await getJobStatus(jobId);
 
-                if(!status){
+                if (!status) {
                     clearInterval(id);
                     return;
                 }
 
-                if(status.status === "done"){
+                if (status.status === "done") {
                     setIsProcessing(false);
                     setProcessingMessage("Processing complete");
                     clearInterval(id);
                 }
 
-                if(status.status === "error"){
+                if (status.status === "error") {
                     setIsProcessing(false);
                     setProcessingMessage(status.error || "Job failed on the server.");
                     clearInterval(id);
@@ -129,14 +207,14 @@ export default function Preview() {
         setIsProcessing(true);
         setProcessingMessage(null); // Clear any previous errors/success messages
         setJobId(null); // Reset job ID for a fresh run
-        
+
         try {
             // Remove the '#' from the hex color
             const hexWithoutHash = color.replace('#', '');
-            
+
             // Submit job with correct parameters
             const response = await submitProcessingJob(filename, hexWithoutHash, tolerance);
-            
+
             // Store returned jobId
             setJobId(response.jobId);
         } catch (err) {
@@ -241,9 +319,9 @@ export default function Preview() {
                                 onChange={(e) => setColor(e.target.value)}
                             />
                         </div>
-                        
+
                     </div>
-                    
+
                     <button className="
                                 w-full mt-6
                                 bg-primary text-white
@@ -257,25 +335,25 @@ export default function Preview() {
                                 disabled:opacity-50
                                 disabled:cursor-not-allowed
                             "
-                            onClick={processVideo}
-                            disabled={isProcessing}
-                            >
-                                {isProcessing ? "Processing video..." : "Process Video with These Settings"}
-                        
+                        onClick={processVideo}
+                        disabled={isProcessing}
+                    >
+                        {isProcessing ? "Processing video..." : "Process Video with These Settings"}
+
                     </button>
-                    
+
                     {isProcessing && (
                         <div style={{ width: "100%", marginTop: 16 }}>
                             <LinearProgress />
                         </div>
                     )}
-                    
-                    {processingMessage && 
-                    <div className="mt-5">
-                        <div className={processingMessage === "Processing complete" ? "text-sm font-semibold text-green-600 mt-1" : "text-sm font-semibold text-red-600 mt-1" }>
-                            {processingMessage}
-                        </div>
-                    </div>}
+
+                    {processingMessage &&
+                        <div className="mt-5">
+                            <div className={processingMessage === "Processing complete" ? "text-sm font-semibold text-green-600 mt-1" : "text-sm font-semibold text-red-600 mt-1"}>
+                                {processingMessage}
+                            </div>
+                        </div>}
                 </div>
             </div>
         </div>
