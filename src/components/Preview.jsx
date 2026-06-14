@@ -171,7 +171,7 @@ export default function Preview() {
     // Job Status Polling
     useEffect(() => {
         if (!jobId) return;
-
+        console.log(jobId)
         const id = setInterval(async () => {
             try {
                 const status = await getJobStatus(jobId);
@@ -355,6 +355,19 @@ export default function Preview() {
                             </div>
                         </div>}
                 </div>
+                {processingMessage === "Processing complete" && <button className="
+                                w-full mt-6
+                                bg-primary text-white
+                                font-semibold text-sm
+                                px-4 py-3
+                                rounded-xl
+                                shadow-xs
+                                transition-all duration-200
+                                border border-primary/40
+                                cursor-pointer
+                                disabled:opacity-50
+                                disabled:cursor-not-allowed
+                            ">download</button>  }
             </div>
         </div>
     );
