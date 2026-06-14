@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { getThumbnail, submitProcessingJob, getJobStatus } from '../api.js';
+import { getThumbnail, submitProcessingJob, getJobStatus, getCSV } from '../api.js';
 import LinearProgress from '@mui/material/LinearProgress';
 
 export default function Preview() {
@@ -166,7 +166,8 @@ export default function Preview() {
     }, [imageReady, color, tolerance]);
 
     const [isProcessing, setIsProcessing] = useState(false);
-    const [jobId, setJobId] = useState(null);
+    const [jobId, setJobId] = useState("ede5bfa7-598b-404a-977c-ef2d5a762e8b");
+    const [csv, setCsv] = useState(null)
 
     // Job Status Polling
     useEffect(() => {
@@ -221,6 +222,13 @@ export default function Preview() {
             // Handle submission failure and allow retry
             setIsProcessing(false);
             setProcessingMessage(err.message || "Failed to submit job. Please try again.");
+        }
+    }
+
+    async function getCsvDownload(jobId) {
+        const csvDownload = await getCSV(jobId)
+        if(csvDownload){
+            setCsv(csvDownload.test)
         }
     }
 
@@ -355,7 +363,7 @@ export default function Preview() {
                             </div>
                         </div>}
                 </div>
-                {processingMessage === "Processing complete" && <button className="
+                {<button className="
                                 w-full mt-6
                                 bg-primary text-white
                                 font-semibold text-sm
@@ -367,8 +375,11 @@ export default function Preview() {
                                 cursor-pointer
                                 disabled:opacity-50
                                 disabled:cursor-not-allowed
-                            ">download</button>  }
+                            "
+                            onClick={() => getCsvDownload(jobId)}
+                            >download</button>  }
             </div>
+            <div>{csv}</div>
         </div>
     );
 }

@@ -51,3 +51,13 @@ export async function getJobStatus(jobId) {
   //return response
   return res.json();
 }
+
+export async function getCSV(jobId){
+  const res =  await fetch(`/download/${jobId}`)
+
+  if(!res.ok){
+    throw new Error(`Server responded ${res.status}`)
+  }
+
+  return res.json();
+}
