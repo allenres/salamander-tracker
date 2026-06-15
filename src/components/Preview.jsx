@@ -166,7 +166,7 @@ export default function Preview() {
     }, [imageReady, color, tolerance]);
 
     const [isProcessing, setIsProcessing] = useState(false);
-    const [jobId, setJobId] = useState("ede5bfa7-598b-404a-977c-ef2d5a762e8b");
+    const [jobId, setJobId] = useState(null);
     const [csv, setCsv] = useState(null)
 
     // Job Status Polling
@@ -226,10 +226,7 @@ export default function Preview() {
     }
 
     async function getCsvDownload(jobId) {
-        const csvDownload = await getCSV(jobId)
-        if(csvDownload){
-            setCsv(csvDownload.test)
-        }
+        window.location.href = `/download/${jobId}`;
     }
 
     return (
@@ -363,7 +360,7 @@ export default function Preview() {
                             </div>
                         </div>}
                 </div>
-                {<button className="
+                {processingMessage && <button className="
                                 w-full mt-6
                                 bg-primary text-white
                                 font-semibold text-sm
