@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { getThumbnail, submitProcessingJob, getJobStatus, getCSV } from '../api.js';
+import { getThumbnail, submitProcessingJob, getJobStatus } from '../api.js';
 import LinearProgress from '@mui/material/LinearProgress';
 
 export default function Preview() {
@@ -8,7 +8,12 @@ export default function Preview() {
     const [thumbnail, setThumbnail] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [jobId, setJobId] = useState(null);
+    const [jobStatus, setJobStatus] = useState(null); // 'queued', 'running', 'done', 'error'
     const [processingMessage, setProcessingMessage] = useState(null);
+    
 
     const [color, setColor] = useState('#000000');
     const [tolerance, setTolerance] = useState(0);
@@ -165,14 +170,10 @@ export default function Preview() {
 
     }, [imageReady, color, tolerance]);
 
-    const [isProcessing, setIsProcessing] = useState(false);
-    const [jobId, setJobId] = useState(null);
-    const [csv, setCsv] = useState(null)
-
     // Job Status Polling
     useEffect(() => {
         if (!jobId) return;
-        console.log(jobId)
+        
         const id = setInterval(async () => {
             try {
                 const status = await getJobStatus(jobId);
@@ -182,9 +183,11 @@ export default function Preview() {
                     return;
                 }
 
+                setJobStatus(status.status);
+
                 if (status.status === "done") {
                     setIsProcessing(false);
-                    setProcessingMessage("Processing complete");
+                    setProcessingMessage("Processing complete!");
                     clearInterval(id);
                 }
 
@@ -195,10 +198,11 @@ export default function Preview() {
                 }
             } catch (err) {
                 setIsProcessing(false);
+                setJobStatus("error");
                 setProcessingMessage("Failed to check job status.");
                 clearInterval(id);
             }
-        }, 5000);
+        }, 1500);
 
         return () => clearInterval(id);
     }, [jobId]);
@@ -206,21 +210,20 @@ export default function Preview() {
     // Submits the job to the API
     async function processVideo() {
         setIsProcessing(true);
-        setProcessingMessage(null); // Clear any previous errors/success messages
-        setJobId(null); // Reset job ID for a fresh run
+        setProcessingMessage(null);
+        setJobId(null); 
 
         try {
             // Remove the '#' from the hex color
             const hexWithoutHash = color.replace('#', '');
 
-            // Submit job with correct parameters
             const response = await submitProcessingJob(filename, hexWithoutHash, tolerance);
 
-            // Store returned jobId
             setJobId(response.jobId);
         } catch (err) {
             // Handle submission failure and allow retry
             setIsProcessing(false);
+            setJobStatus(null);
             setProcessingMessage(err.message || "Failed to submit job. Please try again.");
         }
     }
@@ -308,6 +311,7 @@ export default function Preview() {
                                 min="0"
                                 max="255"
                                 value={tolerance}
+                                disabled={isProcessing}
                                 onChange={(e) => setTolerance(Number(e.target.value))}
                             />
                         </div>
@@ -321,6 +325,7 @@ export default function Preview() {
                                 className="w-full h-10 rounded-md cursor-pointer bg-transparent"
                                 type="color"
                                 value={color}
+                                disabled={isProcessing}
                                 onChange={(e) => setColor(e.target.value)}
                             />
                         </div>
@@ -343,40 +348,36 @@ export default function Preview() {
                         onClick={processVideo}
                         disabled={isProcessing}
                     >
-                        {isProcessing ? "Processing video..." : "Process Video with These Settings"}
-
+                        {isProcessing ? "Processing" : "Process Video with These Settings"}
                     </button>
 
                     {isProcessing && (
-                        <div style={{ width: "100%", marginTop: 16 }}>
+                        <div className="w-full mt-4 space-y-2">
                             <LinearProgress />
+                            <div className="flex justify-between text-xs font-mono text-text/60">
+                                {jobStatus && (<span className="capitalize">Status: {jobStatus}</span>)}
+                            </div>
                         </div>
                     )}
 
-                    {processingMessage &&
-                        <div className="mt-5">
-                            <div className={processingMessage === "Processing complete" ? "text-sm font-semibold text-green-600 mt-1" : "text-sm font-semibold text-red-600 mt-1"}>
+                    {processingMessage && (
+                        <div className="mt-10 p-3 rounded-lg  bg-bg border shadow-xs">
+                            <div className={jobStatus === "done" ? "text-sm font-semibold text-green-600" : "text-sm font-semibold text-red-600"}>
                                 {processingMessage}
                             </div>
-                        </div>}
+
+                            {jobStatus === "done" && (
+                                <button
+                                    onClick={() => getCsvDownload(jobId)}
+                                    className="mt-3 inline-flex w-full justify-center items-center gap-1 bg-primary hover:bg-green-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition-colors cursor-pointer"
+                                >
+                                    Download CSV Results
+                                </button>
+                            )}
+                        </div>
+                    )}
                 </div>
-                {processingMessage && <button className="
-                                w-full mt-6
-                                bg-primary text-white
-                                font-semibold text-sm
-                                px-4 py-3
-                                rounded-xl
-                                shadow-xs
-                                transition-all duration-200
-                                border border-primary/40
-                                cursor-pointer
-                                disabled:opacity-50
-                                disabled:cursor-not-allowed
-                            "
-                            onClick={() => getCsvDownload(jobId)}
-                            >download</button>  }
             </div>
-            <div>{csv}</div>
         </div>
     );
 }
