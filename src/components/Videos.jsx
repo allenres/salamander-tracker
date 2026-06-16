@@ -2,42 +2,51 @@ import { useState, useEffect } from 'react';
 import { getVideos } from '../api.js';
 import { useNavigate } from "react-router-dom";
 
-function VideoCard({ videoName, onSelect, showTags }) {
+function VideoCard({ videoName, onSelect, showTags, addTag}) {
+    const tagArray = []
+    localStorage.setItem(videoName, tagArray)
     const [isHovered, setIsHovered] = useState(false);
     
-
     return (
-        <button
-            onClick={onSelect}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            className="bg-bg border-2 border-primary/30 hover:border-primary hover:scale-[1.02] active:scale-[0.98] rounded-xl overflow-hidden text-left flex flex-col justify-between shadow-xs transition-all cursor-pointer group w-full"
-        >
-            <div className="w-full aspect-video bg-text/5 overflow-hidden relative border-b border-secondary/20">
-                <img 
-                    src={isHovered ? `/preview/${videoName}` : `/thumbnail/${videoName}`} 
-                    alt={videoName}
-                    className="w-full h-full object-cover transition-opacity duration-200"
-                    loading="lazy"
-                />
-                
-                {isHovered && (
-                    <span className="absolute top-2 right-2 bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-sm animate-pulse uppercase tracking-wider">
-                        Preview
-                    </span>
-                )}
-            </div>
+        <div>
+            <button
+                onClick={onSelect}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                className="bg-bg border-2 border-primary/30 hover:border-primary hover:scale-[1.02] active:scale-[0.98] rounded-xl overflow-hidden text-left flex flex-col justify-between shadow-xs transition-all cursor-pointer group w-full"
+                disabled={addTag ? true : false}
+            >
+                <div className="w-full aspect-video bg-text/5 overflow-hidden relative border-b border-secondary/20">
+                    <img 
+                        src={isHovered ? `/preview/${videoName}` : `/thumbnail/${videoName}`} 
+                        alt={videoName}
+                        className="w-full h-full object-cover transition-opacity duration-200"
+                        loading="lazy"
+                    />
+                    
+                    {isHovered && (
+                        <span className="absolute top-2 right-2 bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-sm animate-pulse uppercase tracking-wider">
+                            Preview
+                        </span>
+                    )}
+                </div>
 
-            <div className="p-4 w-full">
-                <span className="text-xs font-mono bg-secondary/40 text-text/80 px-2 py-1 rounded-sm block truncate">
-                    {videoName}
-                </span>
-                {showTags && <span className="text-xs font-mono bg-secondary/40 text-text/80 px-2 py-1 rounded-sm block truncate">
-                    {videoName}
-                </span>}
-                
+                <div className="p-4 w-full">
+                    <span className="text-xs font-mono bg-secondary/40 text-text/80 px-2 py-1 rounded-sm block truncate">
+                        {videoName}
+                    </span>
+                    
+                    
+                </div>
+            </button>
+            
+            <div>
+                {addTag && <button onClick={() => alert("hi")}>+</button>}
+                    {showTags && <span className="text-xs font-mono bg-secondary/40 text-text/80 px-2 py-1 rounded-sm block truncate">
+                        {"fdse"}
+                    </span>}
             </div>
-        </button>
+        </div>
     );
 }
 
@@ -48,6 +57,7 @@ function Videos() {
     const [filter, setFilter] = useState(null);
     const navigate = useNavigate();
     const [isShowTag, setIsShowTag] = useState(false);
+    const [isAddTag, setIsAddTag] = useState(false)
 
     useEffect(() => {
         getVideos()
@@ -76,6 +86,7 @@ function Videos() {
                 </select>
                 <button 
                     className='bg-bg border border-secondary/60 rounded-lg px-3 py-1.5 text-sm text-text focus:outline-none focus:border-primary cursor-pointer'
+                    onClick={()=> setIsAddTag(!isAddTag)}
                     >Add tag
                 </button>
                 <button 
@@ -117,6 +128,7 @@ function Videos() {
                                     key={videoName}
                                     videoName={videoName}
                                     showTags={isShowTag}
+                                    addTag={isAddTag}
                                     onSelect={() => navigate(`/preview/${videoName}`)}
                                 />
                             ))}
