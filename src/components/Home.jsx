@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 function Home() {
     return (
         <div className="max-w-3xl mx-auto px-4 py-16 text-center">
-            {/* Using the primary color token (#666f20) instead of generic blue */}
             <h1 className="text-4xl md:text-5xl font-black tracking-tight text-primary mb-4">
                 Salamander Tracker
             </h1>
