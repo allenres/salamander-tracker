@@ -1,12 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { getVideos } from '../api.js';
 import { useNavigate } from "react-router-dom";
+function setTagData(filename){
 
-function VideoCard({ videoName, onSelect, showTags, addTag}) {
+}
+function VideoCard({ videoName, onSelect, showTags, showAddTag}) {
     const tagArray = []
     localStorage.setItem(videoName, tagArray)
+    console.log(localStorage.getItem(videoName))
     const [isHovered, setIsHovered] = useState(false);
-    
+    const [addTag, setAddTag] = useState(false);
+    const [tagName, setTagName] = useState("")
+
     return (
         <div>
             <button
@@ -38,14 +43,47 @@ function VideoCard({ videoName, onSelect, showTags, addTag}) {
                     
                     
                 </div>
+                {showTags && <span className="text-xs font-mono bg-secondary/40 text-text/80 px-2 py-1 rounded-sm block truncate">
+                    {"fdse"}
+                </span>}
             </button>
             
-            <div>
-                {addTag && <button onClick={() => alert("hi")}>+</button>}
-                    {showTags && <span className="text-xs font-mono bg-secondary/40 text-text/80 px-2 py-1 rounded-sm block truncate">
-                        {"fdse"}
-                    </span>}
-            </div>
+            {showAddTag && <div className="mt-3">
+                {addTag && <div className="mt-3 p-3 bg-secondary/20 border border-secondary/60 rounded-lg">
+                    <label
+                        htmlFor="add"
+                        className="block text-xs font-semibold text-text/80 mb-2"
+                    >
+                        Tag:
+                    </label>
+
+                    <input
+                        type="text"
+                        name="add"
+                        id="add"
+                        placeholder='enter a tag...'
+                        onChange={(e) => setTagName(e.target.value)}
+                        className="w-full bg-bg border border-secondary/60 rounded-lg px-3 py-2 text-sm text-text focus:outline-none focus:border-primary"
+                    />
+                    <button
+                    className="self-start bg-primary text-white rounded-lg px-3 py-1.5 text-sm font-medium hover:scale-[1.02] active:scale-[0.98] transition-all mt-3"
+                    onClick={() => setAddTag(false)}
+                    >
+                        Save Tag
+                    </button>
+                </div>}
+
+                <button
+                    onClick={() => {
+                        setAddTag(!addTag)
+                    }}
+                    className="mt-3 bg-bg border border-secondary/60 rounded-lg px-3 py-1.5 text-sm text-text hover:border-primary transition-all cursor-pointer"
+                >
+                    {addTag ? "Cancel" : "Add Tag"}
+                </button>
+            </div>}
+
+            
         </div>
     );
 }
@@ -87,7 +125,8 @@ function Videos() {
                 <button 
                     className='bg-bg border border-secondary/60 rounded-lg px-3 py-1.5 text-sm text-text focus:outline-none focus:border-primary cursor-pointer'
                     onClick={()=> setIsAddTag(!isAddTag)}
-                    >Add tag
+                    >
+                    {isAddTag ? "Exit tag mode" : "Add tags"}
                 </button>
                 <button 
                     className='bg-bg border border-secondary/60 rounded-lg px-3 py-1.5 text-sm text-text focus:outline-none focus:border-primary cursor-pointer'
@@ -128,7 +167,7 @@ function Videos() {
                                     key={videoName}
                                     videoName={videoName}
                                     showTags={isShowTag}
-                                    addTag={isAddTag}
+                                    showAddTag={isAddTag}
                                     onSelect={() => navigate(`/preview/${videoName}`)}
                                 />
                             ))}
