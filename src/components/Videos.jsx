@@ -6,6 +6,7 @@ function Videos() {
     const [videos, setVideos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [filter, setFilter] = useState(null)
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -23,6 +24,11 @@ function Videos() {
         <div className="max-w-5xl mx-auto px-4 py-8">
             <h1 className="text-3xl font-bold mb-2 text-text">Video Analyzer</h1>
             <p className="text-text/80 mb-8 font-medium">Select a Video</p>
+
+            <select value={filter} onChange={() => setFilter(e.target.value)}>
+                <option value="all">All</option>
+                <option value="pinned">Pinned</option>
+            </select>
 
             {/* --- Loading State --- */}
             {loading && (
