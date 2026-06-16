@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { getVideos } from '../api.js';
 import { useNavigate } from "react-router-dom";
 
-function VideoCard({ videoName, onSelect }) {
+function VideoCard({ videoName, onSelect, showTags }) {
     const [isHovered, setIsHovered] = useState(false);
+    
 
     return (
         <button
@@ -31,6 +32,10 @@ function VideoCard({ videoName, onSelect }) {
                 <span className="text-xs font-mono bg-secondary/40 text-text/80 px-2 py-1 rounded-sm block truncate">
                     {videoName}
                 </span>
+                {showTags && <span className="text-xs font-mono bg-secondary/40 text-text/80 px-2 py-1 rounded-sm block truncate">
+                    {videoName}
+                </span>}
+                
             </div>
         </button>
     );
@@ -42,6 +47,7 @@ function Videos() {
     const [error, setError] = useState(null);
     const [filter, setFilter] = useState(null);
     const navigate = useNavigate();
+    const [isShowTag, setIsShowTag] = useState(false);
 
     useEffect(() => {
         getVideos()
@@ -68,6 +74,15 @@ function Videos() {
                     <option value="all">All Videos</option>
                     <option value="pinned">Pinned</option>
                 </select>
+                <button 
+                    className='bg-bg border border-secondary/60 rounded-lg px-3 py-1.5 text-sm text-text focus:outline-none focus:border-primary cursor-pointer'
+                    >Add tag
+                </button>
+                <button 
+                    className='bg-bg border border-secondary/60 rounded-lg px-3 py-1.5 text-sm text-text focus:outline-none focus:border-primary cursor-pointer'
+                    onClick={() => {setIsShowTag(!isShowTag)}}
+                >Show tags</button>
+                
             </div>
 
             {/* --- Loading State --- */}
@@ -101,6 +116,7 @@ function Videos() {
                                 <VideoCard 
                                     key={videoName}
                                     videoName={videoName}
+                                    showTags={isShowTag}
                                     onSelect={() => navigate(`/preview/${videoName}`)}
                                 />
                             ))}
