@@ -1,16 +1,18 @@
 import { useState, useEffect, use } from 'react';
 import { getVideos } from '../api.js';
 import { useNavigate } from "react-router-dom";
-function setTagData(filename){
 
-}
 function VideoCard({ videoName, onSelect, showTags, showAddTag}) {
-    const tagArray = []
-    localStorage.setItem(videoName, tagArray)
     console.log(localStorage.getItem(videoName))
     const [isHovered, setIsHovered] = useState(false);
     const [addTag, setAddTag] = useState(false);
     const [tagName, setTagName] = useState("")
+
+    function setTagData(tag){
+        setAddTag(false)
+        localStorage.setItem(videoName, tag)
+        alert(tag + " saved") 
+    }
 
     return (
         <div>
@@ -43,9 +45,11 @@ function VideoCard({ videoName, onSelect, showTags, showAddTag}) {
                     
                     
                 </div>
-                {showTags && <span className="text-xs font-mono bg-secondary/40 text-text/80 px-2 py-1 rounded-sm block truncate">
-                    {"fdse"}
-                </span>}
+                {showTags && 
+                <p className="w-fit m-2 px-2 py-1 text-xs font-medium bg-primary/15 text-primary rounded-full">
+                    {localStorage.getItem(videoName) ? localStorage.getItem(videoName) : "None"}
+                </p>
+                }
             </button>
             
             {showAddTag && <div className="mt-3">
@@ -67,7 +71,7 @@ function VideoCard({ videoName, onSelect, showTags, showAddTag}) {
                     />
                     <button
                     className="self-start bg-primary text-white rounded-lg px-3 py-1.5 text-sm font-medium hover:scale-[1.02] active:scale-[0.98] transition-all mt-3"
-                    onClick={() => setAddTag(false)}
+                    onClick={() => setTagData(tagName)}
                     >
                         Save Tag
                     </button>
