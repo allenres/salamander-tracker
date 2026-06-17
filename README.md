@@ -68,7 +68,7 @@ Congratulations you are set up!
 
 
 # How to use feature
-Our project has a tag feature for videos section. It uses localStorage to save tags you've made so even if you refesh it will stay, and you can have multiple tags for each one. There are two main buttons add tags and show tags. Show tags will show show all tags on each video the add tags button will put you in tag mode. Tag mode puts you in a mode where you can save and remove tags by first typing and pressing.
+Our project has a tag feature for videos section. It uses localStorage to save tags you've made so even if you refesh it will stay, and you can have multiple tags for each video. There are two main buttons add tags and show tags. Show tags will show show all tags on each video the add tags button will put you in tag mode. Tag mode puts you in a mode where you can save and remove tags by first typing and pressing.
 
 Relevant screenshots:
 
@@ -86,4 +86,4 @@ Relevant screenshots:
 
 # Local Storage
 
-![alt text](localStorage.png)
+![alt text](public/localStorage.png)
