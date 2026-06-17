@@ -3,15 +3,35 @@ import { getVideos } from '../api.js';
 import { useNavigate } from "react-router-dom";
 
 function VideoCard({ videoName, onSelect, showTags, showAddTag}) {
-    console.log(localStorage.getItem(videoName))
     const [isHovered, setIsHovered] = useState(false);
     const [addTag, setAddTag] = useState(false);
     const [tagName, setTagName] = useState("")
+    const [tagArray, setTagArray] = useState([])
 
-    function setTagData(tag){
-        setAddTag(false)
-        localStorage.setItem(videoName, tag)
-        alert(tag + " saved") 
+    useEffect(() => {
+        const stored = localStorage.getItem(videoName) || "";
+        setTagArray(stored ? stored.split(",") : []);
+    }, [videoName]);
+
+    function setTagData(){
+        const existing = localStorage.getItem(videoName) || "";
+        const updated =
+            existing === ""
+                ? tagName
+                : existing + "," + tagName;
+        setTagArray(updated.split(","))
+        localStorage.setItem(videoName, updated);
+
+        console.log(updated)
+    }
+
+    function removeTag(tag) {
+        const updated = tagArray
+            .filter(t => t !== tag);
+
+        setTagArray(updated);
+        localStorage.setItem(videoName, updated.join(","));
+        setAddTag(false);
     }
 
     return (
@@ -46,10 +66,19 @@ function VideoCard({ videoName, onSelect, showTags, showAddTag}) {
                     
                 </div>
                 {showTags && 
-                <p className="w-fit m-2 px-2 py-1 text-xs font-medium bg-primary/15 text-primary rounded-full">
-                    {localStorage.getItem(videoName) ? localStorage.getItem(videoName) : "None"}
-                </p>
+
+                <div className="flex flex-wrap gap-2 px-4 py-2">
+                    {tagArray.map((el, i) => (
+                        <span
+                            key={i}
+                            className="inline-block m-1 px-2 py-1 text-xs bg-primary/15 text-primary rounded-full"
+                        >
+                            {el}
+                        </span>
+                    ))}
+                </div>
                 }
+
             </button>
             
             {showAddTag && <div className="mt-3">
@@ -65,16 +94,28 @@ function VideoCard({ videoName, onSelect, showTags, showAddTag}) {
                         type="text"
                         name="add"
                         id="add"
-                        placeholder='enter a tag...'
-                        onChange={(e) => setTagName(e.target.value)}
+                        placeholder='enter a tag or video name...'
+                        onChange={(e) => {setTagName(e.target.value)}
+                            
+                        }
                         className="w-full bg-bg border border-secondary/60 rounded-lg px-3 py-2 text-sm text-text focus:outline-none focus:border-primary"
                     />
-                    <button
-                    className="self-start bg-primary text-white rounded-lg px-3 py-1.5 text-sm font-medium hover:scale-[1.02] active:scale-[0.98] transition-all mt-3"
-                    onClick={() => setTagData(tagName)}
-                    >
-                        Save Tag
-                    </button>
+                    <div className='flex justify-between items-center'>
+                        <button
+                            className="self-start bg-primary text-white rounded-lg px-3 py-1.5 text-sm font-medium hover:scale-[1.02] active:scale-[0.98] transition-all mt-3"
+                            onClick={() => setTagData()}
+                        >
+                            Save Tag
+                        </button>
+
+                        <button
+                            className="self-start bg-primary text-white rounded-lg px-3 py-1.5 text-sm font-medium hover:scale-[1.02] active:scale-[0.98] transition-all mt-3"
+                            onClick={() => removeTag(tagName)}
+                        >
+                            Remove Tag
+                        </button>
+                    </div>
+                    
                 </div>}
 
                 <button
@@ -83,7 +124,7 @@ function VideoCard({ videoName, onSelect, showTags, showAddTag}) {
                     }}
                     className="mt-3 bg-bg border border-secondary/60 rounded-lg px-3 py-1.5 text-sm text-text hover:border-primary transition-all cursor-pointer"
                 >
-                    {addTag ? "Cancel" : "Add Tag"}
+                    {addTag ? "Cancel" : "Edit Tags"}
                 </button>
             </div>}
 
