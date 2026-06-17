@@ -159,14 +159,18 @@ function Videos() {
             <p className="text-text/80 mb-6 font-medium">Select a Video</p>
 
             <div className="mb-6">
-                <select 
+                {/* <select 
                     value={filter} 
                     onChange={(e) => setFilter(e.target.value)}
                     className="bg-bg border border-secondary/60 rounded-lg px-3 py-1.5 text-sm text-text focus:outline-none focus:border-primary cursor-pointer"
                 >
                     <option value="all">All Videos</option>
-                    <option value="pinned">Pinned</option>
-                </select>
+                    { videos.filter(el => localStorage.getItem(el)).map((el, i) => {
+                        return <option key={i} value={el}>
+                                {localStorage.getItem(el)}
+                            </option>
+                    })}
+                </select> */}
                 <button 
                     className='bg-bg border border-secondary/60 rounded-lg px-3 py-1.5 text-sm text-text focus:outline-none focus:border-primary cursor-pointer'
                     onClick={()=> setIsAddTag(!isAddTag)}

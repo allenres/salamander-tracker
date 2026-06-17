@@ -2,19 +2,45 @@
 - Brendan Villaraza
 - Allen Resulidze
 
-# React + Vite
+# What is Slamander Tracker
+Welcome to the salamander tracker repo front end. This project is used to track the largest connected centroid of pixels based on a selected threshold and target color. The main focus of this project is tracking the centroid of a salamanders movement over a long course of time. This project pulls data from the back end please make sure to set it up so this project properly functions.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Please refer to this link for intructions on how to set up the backend:  https://github.com/allenres/centroid-finder
 
-Currently, two official plugins are available:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+# Set Up Guide
+First fork and clone the project from the repo 
 
-## React Compiler
+Press the fork button and create a new fork:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+![alt text](public/image-1.png)
 
-## Expanding the ESLint configuration
+Then press code and copy the github link
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+![alt text](public/image-3.png)
+
+Open your command line of choice and clone the repo inside a folder and run the command:
+
+        git clone https://github.com/youruserhere/salamander-tracker.git
+
+Then cd into the folder
+
+        cd salamander-tracker/
+
+Lastly run code . this will open the repo in vscode
+
+        code .
+
+In the terminal run the command npm i this will install the required modules and dependencies
+
+        npm i
+
+To run the front end type
+
+        npm run dev
+
+Note you must run the back end of this project this can be done with the command
+
+        node index.js
+
+Congratulations you are set up!
