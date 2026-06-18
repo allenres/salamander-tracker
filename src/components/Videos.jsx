@@ -111,14 +111,14 @@ function VideoCard({ videoName, onSelect, showTags, showAddTag, onTagChange}) {
                     />
                     <div className='flex justify-between items-center'>
                         <button
-                            className="self-start bg-primary text-white rounded-lg px-3 py-1.5 text-sm font-medium hover:scale-[1.02] active:scale-[0.98] transition-all mt-3"
+                            className="self-start bg-primary text-white rounded-lg px-3 py-1.5 text-sm font-medium hover:scale-[1.02] active:scale-[0.98] transition-all mt-3 cursor-pointer"
                             onClick={() => setTagData()}
                         >
                             Save Tag
                         </button>
                         
                         <button
-                            className="self-start bg-primary text-white rounded-lg px-3 py-1.5 text-sm font-medium hover:scale-[1.02] active:scale-[0.98] transition-all mt-3"
+                            className="self-start bg-primary text-white rounded-lg px-3 py-1.5 text-sm font-medium hover:scale-[1.02] active:scale-[0.98] transition-all mt-3 cursor-pointer"
                             onClick={() => removeTag(tagName)}
                         >
                             Remove Tag
@@ -131,7 +131,7 @@ function VideoCard({ videoName, onSelect, showTags, showAddTag, onTagChange}) {
                     onClick={() => {
                         setAddTag(!addTag)
                     }}
-                    className="mt-3 bg-bg border border-secondary/60 rounded-lg px-3 py-1.5 text-sm text-text hover:border-primary transition-all cursor-pointer"
+                    className="mt-3 bg-bg border border-secondary/60 rounded-lg px-3 py-1.5 text-sm text-text hover:border-primary transition-all cursor-pointer font-medium"
                 >
                     {addTag ? "Cancel" : "Edit Tags"}
                 </button>
@@ -215,13 +215,13 @@ function Videos() {
                 <select 
                     value={filter} 
                     onChange={(e) => setFilter(e.target.value)}
-                    className="bg-bg border border-secondary/60 rounded-lg px-3 py-1.5 text-sm text-text focus:outline-none focus:border-primary cursor-pointer"
+                    className="bg-bg border border-secondary/60 rounded-lg px-3 py-1.5 text-sm text-text focus:outline-none focus:border-primary cursor-pointer font-medium mr-4"
                 >
                     <option value="All Tags">All Tags</option>
                     {inputArr.map(el => <option value={el}> {el}</option>)}
                 </select>
                 <button 
-                    className='bg-bg border border-secondary/60 rounded-lg px-3 py-1.5 text-sm text-text focus:outline-none focus:border-primary cursor-pointer'
+                    className='bg-bg border border-secondary/60 rounded-lg px-3 py-1.5 text-sm text-text focus:outline-none focus:border-primary cursor-pointer font-medium mr-4'
                     onClick={()=> {
                         setIsAddTag(!isAddTag)
                         setIsShowTag(!isShowTag)
@@ -230,7 +230,7 @@ function Videos() {
                     {isAddTag ? "Exit tag mode" : "Enter tag mode"}
                 </button>
                 <button 
-                    className='bg-bg border border-secondary/60 rounded-lg px-3 py-1.5 text-sm text-text focus:outline-none focus:border-primary cursor-pointer'
+                    className='bg-bg border border-secondary/60 rounded-lg px-3 py-1.5 text-sm text-text focus:outline-none focus:border-primary cursor-pointer font-medium'
                     onClick={() => {setIsShowTag(!isShowTag)}}
                 >Show tags</button>
                 
