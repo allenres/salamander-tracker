@@ -142,6 +142,33 @@ function Videos() {
     const [isShowTag, setIsShowTag] = useState(false);
     const [isAddTag, setIsAddTag] = useState(false)
 
+    const[inputArr, setInputArr] = useState([])
+
+    useEffect(() => {
+        const vids = videos.filter((el) => localStorage.getItem(el) != ""); // mp4
+    
+        const seen = new Set()
+        
+
+        const vids2 = vids.map(el => localStorage.getItem(el).split(","));
+
+        const vids3 = []
+    
+        for(let i = 0; i < vids2.length; i++){
+            for (let j = 0; j < vids2[i].length; j++) {
+                vids3.push(vids2[i][j])
+                seen.add(vids2[i][j])
+            }
+        }
+
+        const seenArray = Array.from(seen)
+        setInputArr(seenArray)
+        console.log(seenArray)
+    },
+    [inputArr])
+
+    // {vids.map((el) => <option value={localStorage.getItem(el)}>{localStorage.getItem(el)}</option>
+
     useEffect(() => {
         getVideos()
             .then((data) => {
@@ -152,25 +179,19 @@ function Videos() {
                 setLoading(false);
             });
     }, []);
-
     return (
         <div className="max-w-5xl mx-auto px-4 py-8">
             <h1 className="text-3xl font-bold mb-2 text-text">Video Analyzer</h1>
             <p className="text-text/80 mb-6 font-medium">Select a Video</p>
-
             <div className="mb-6">
-                {/* <select 
+                <select 
                     value={filter} 
                     onChange={(e) => setFilter(e.target.value)}
                     className="bg-bg border border-secondary/60 rounded-lg px-3 py-1.5 text-sm text-text focus:outline-none focus:border-primary cursor-pointer"
                 >
                     <option value="all">All Videos</option>
-                    { videos.filter(el => localStorage.getItem(el)).map((el, i) => {
-                        return <option key={i} value={el}>
-                                {localStorage.getItem(el)}
-                            </option>
-                    })}
-                </select> */}
+                    {inputArr.map(el => <option value={el}> {el}</option>)}
+                </select>
                 <button 
                     className='bg-bg border border-secondary/60 rounded-lg px-3 py-1.5 text-sm text-text focus:outline-none focus:border-primary cursor-pointer'
                     onClick={()=> setIsAddTag(!isAddTag)}
