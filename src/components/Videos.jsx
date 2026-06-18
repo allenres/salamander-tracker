@@ -107,7 +107,7 @@ function VideoCard({ videoName, onSelect, showTags, showAddTag}) {
                         >
                             Save Tag
                         </button>
-
+                        
                         <button
                             className="self-start bg-primary text-white rounded-lg px-3 py-1.5 text-sm font-medium hover:scale-[1.02] active:scale-[0.98] transition-all mt-3"
                             onClick={() => removeTag(tagName)}
@@ -137,7 +137,7 @@ function Videos() {
     const [videos, setVideos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [filter, setFilter] = useState(null);
+    const [filter, setFilter] = useState("All Tags");
     const navigate = useNavigate();
     const [isShowTag, setIsShowTag] = useState(false);
     const [isAddTag, setIsAddTag] = useState(false)
@@ -189,14 +189,17 @@ function Videos() {
                     onChange={(e) => setFilter(e.target.value)}
                     className="bg-bg border border-secondary/60 rounded-lg px-3 py-1.5 text-sm text-text focus:outline-none focus:border-primary cursor-pointer"
                 >
-                    <option value="all">All Videos</option>
+                    <option value="All Tags">All Tags</option>
                     {inputArr.map(el => <option value={el}> {el}</option>)}
                 </select>
                 <button 
                     className='bg-bg border border-secondary/60 rounded-lg px-3 py-1.5 text-sm text-text focus:outline-none focus:border-primary cursor-pointer'
-                    onClick={()=> setIsAddTag(!isAddTag)}
+                    onClick={()=> {
+                        setIsAddTag(!isAddTag)
+                        setIsShowTag(!isShowTag)
+                    }}
                     >
-                    {isAddTag ? "Exit tag mode" : "Add tags"}
+                    {isAddTag ? "Exit tag mode" : "Enter tag mode"}
                 </button>
                 <button 
                     className='bg-bg border border-secondary/60 rounded-lg px-3 py-1.5 text-sm text-text focus:outline-none focus:border-primary cursor-pointer'
@@ -232,7 +235,17 @@ function Videos() {
                         <p className="text-center text-text/60 py-12">No videos found available.</p>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                            {videos.map((videoName) => (
+
+                            {filter === "All Tags" && videos.map((videoName) => (
+                                <VideoCard 
+                                    key={videoName}
+                                    videoName={videoName}
+                                    showTags={isShowTag}
+                                    showAddTag={isAddTag}
+                                    onSelect={() => navigate(`/preview/${videoName}`)}
+                                />
+                            ))}
+                            {videos.filter((el) => localStorage.getItem(el).includes(filter)).map((videoName) => (
                                 <VideoCard 
                                     key={videoName}
                                     videoName={videoName}
