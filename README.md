@@ -72,6 +72,10 @@ Our project has a tag feature for videos section. It uses localStorage to save t
 
 Relevant screenshots:
 
+# Tag filter
+
+![alt text](public/image-6.png)
+
 # Tag Buttons
 
 ![alt text](public/image.png)
