@@ -2,7 +2,7 @@ import { useState, useEffect, use } from 'react';
 import { getVideos } from '../api.js';
 import { useNavigate } from "react-router-dom";
 
-function VideoCard({ videoName, onSelect, showTags, showAddTag}) {
+function VideoCard({ videoName, onSelect, showTags, showAddTag, onTagChange}) {
     const [isHovered, setIsHovered] = useState(false);
     const [addTag, setAddTag] = useState(false);
     const [tagName, setTagName] = useState("")
@@ -13,25 +13,35 @@ function VideoCard({ videoName, onSelect, showTags, showAddTag}) {
         setTagArray(stored ? stored.split(",") : []);
     }, [videoName]);
 
-    function setTagData(){
-        const existing = localStorage.getItem(videoName) || "";
-        const updated =
-            existing === ""
-                ? tagName
-                : existing + "," + tagName;
-        setTagArray(updated.split(","))
-        localStorage.setItem(videoName, updated);
+    function setTagData() {
+        const existing = localStorage.getItem(videoName);
+        const tags = existing ? existing.split(",") : [];
+        const cleanedTag = tagName.trim();
 
-        console.log(updated)
+        if (!cleanedTag) return;
+
+        if (!tags.includes(cleanedTag)) {
+            tags.push(cleanedTag);
+        }
+
+        const updated = tags.join(",");
+        setTagArray(tags);
+        localStorage.setItem(videoName, updated);
+        onTagChange?.();
+
+        console.log(updated);
     }
 
     function removeTag(tag) {
-        const updated = tagArray
-            .filter(t => t !== tag);
+        setTagArray(prev => {
+            const updated = prev.filter(t => t !== tag);
 
-        setTagArray(updated);
-        localStorage.setItem(videoName, updated.join(","));
-        setAddTag(false);
+            localStorage.setItem(videoName, updated.join(","));
+
+            return updated;
+        });
+
+        onTagChange?.();
     }
 
     return (
@@ -68,8 +78,7 @@ function VideoCard({ videoName, onSelect, showTags, showAddTag}) {
                 {showTags && 
 
                 <div className="flex flex-wrap gap-2 px-4 py-2">
-                    {tagArray.map((el, i) => (
-                        <span
+                    {tagArray.map((el, i) => ( el != "" && <span
                             key={i}
                             className="inline-block m-1 px-2 py-1 text-xs bg-primary/15 text-primary rounded-full"
                         >
@@ -141,33 +150,28 @@ function Videos() {
     const navigate = useNavigate();
     const [isShowTag, setIsShowTag] = useState(false);
     const [isAddTag, setIsAddTag] = useState(false)
-
     const[inputArr, setInputArr] = useState([])
+    const [refreshTags, setRefreshTags] = useState(0);
+
+    const rebuildTags = () => {
+        setRefreshTags(prev => prev + 1);
+    };
 
     useEffect(() => {
-        const vids = videos.filter((el) => localStorage.getItem(el) != ""); // mp4
-    
-        const seen = new Set()
-        
+        const seen = new Set();
 
-        const vids2 = vids.map(el => localStorage.getItem(el).split(","));
+        videos.forEach(video => {
+            const data = localStorage.getItem(video);
 
-        const vids3 = []
-    
-        for(let i = 0; i < vids2.length; i++){
-            for (let j = 0; j < vids2[i].length; j++) {
-                vids3.push(vids2[i][j])
-                seen.add(vids2[i][j])
-            }
-        }
+            if (!data) return;
 
-        const seenArray = Array.from(seen)
-        setInputArr(seenArray)
-        console.log(seenArray)
-    },
-    [inputArr])
+            data.split(",")
+                .filter(Boolean)
+                .forEach(tag => seen.add(tag));
+        });
 
-    // {vids.map((el) => <option value={localStorage.getItem(el)}>{localStorage.getItem(el)}</option>
+        setInputArr(Array.from(seen));
+    }, [videos, refreshTags]);
 
     useEffect(() => {
         getVideos()
@@ -179,6 +183,30 @@ function Videos() {
                 setLoading(false);
             });
     }, []);
+
+    const filteredVideos =
+    filter === "All Tags"
+    ? videos
+    : videos.filter(videoName => {
+
+        const data = localStorage.getItem(videoName);
+
+        if (!data) return false;
+
+      
+        const splitTags = data.split(",");
+
+   
+        const tags = splitTags.map(tag => {
+            return tag.trim();
+        });
+  
+        const hasTag = tags.includes(filter);
+
+        return hasTag;
+    });
+
+
     return (
         <div className="max-w-5xl mx-auto px-4 py-8">
             <h1 className="text-3xl font-bold mb-2 text-text">Video Analyzer</h1>
@@ -236,21 +264,13 @@ function Videos() {
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
 
-                            {filter === "All Tags" && videos.map((videoName) => (
-                                <VideoCard 
+                            {filteredVideos.map(videoName => (
+                                <VideoCard
                                     key={videoName}
                                     videoName={videoName}
                                     showTags={isShowTag}
                                     showAddTag={isAddTag}
-                                    onSelect={() => navigate(`/preview/${videoName}`)}
-                                />
-                            ))}
-                            {videos.filter((el) => localStorage.getItem(el).includes(filter)).map((videoName) => (
-                                <VideoCard 
-                                    key={videoName}
-                                    videoName={videoName}
-                                    showTags={isShowTag}
-                                    showAddTag={isAddTag}
+                                    onTagChange={rebuildTags}
                                     onSelect={() => navigate(`/preview/${videoName}`)}
                                 />
                             ))}
